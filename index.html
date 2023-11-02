@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>time</title>
+<style type="text/css">
+	#board td		{border: 1px solid black; width: 30px; height: 30px; text-align: center; cursor:pointer; user-select: none;}
+	#board td:hover {background: lightblue;}
+</style>
+<script type="text/javascript">
+
+let boardSize = [3, 3]; //define size of game.
+let tiles;
+
+function main() {
+	buildBoard();
+}
+
+function buildBoard() {
+	let htmlString = '';
+	for(i = 0; i < boardSize[0]; i++) {
+		htmlString += '<tr>';
+		for(j = 0; j < boardSize[1]; j++) {
+			htmlString += '<td class="tile" onclick="markMe('+ i +','+ j +')"></td>';
+		}
+		htmlString += '</tr>';
+	}
+	document.getElementById('board').innerHTML = htmlString;
+	tiles = document.getElementsByClassName('tile');
+}
+
+let turn = 1;
+function flipTurn() {
+	turn = turn * -1;
+	if (turn == 1) {
+		document.getElementById('message').innerHTML = '❌\'s Turn';
+	} else {
+		document.getElementById('message').innerHTML = '🟢\'s Turn';
+	}
+}
+
+function markMe(ay, ax) {
+	if (turn == 1) {
+		tiles[boardSize[1] * ay + ax].innerHTML = '❌';
+		tiles[boardSize[1] * ay + ax].style.background = 'gainsboro';
+		tiles[boardSize[1] * ay + ax].style.pointerEvents = 'none';
+		flipTurn();
+	} else {
+		tiles[boardSize[1] * ay + ax].innerHTML = '🟢';
+		tiles[boardSize[1] * ay + ax].style.background = 'gainsboro';
+		tiles[boardSize[1] * ay + ax].style.pointerEvents = 'none';
+		flipTurn();
+	}
+	detectTie();
+	detectWin();
+}
+
+function detectTie() {
+	allFilled = true;
+	for (i = 0; i < tiles.length; i++) {
+		if (tiles[i].style.pointerEvents != 'none') {
+			allFilled = false;
+		}
+	}
+	if (allFilled == true) {
+		document.getElementById('message').innerHTML = 'Draw! <a href="">🔄</a>';
+	}
+}
+
+function detectWin() {
+	for (i = 0; i < tiles.length; i++) {
+		let cA, cB, cC, cD;
+		try {
+			if (i < boardSize[1] || i >= boardSize[0] * boardSize[1] - boardSize[1]) {
+				cA = ['n', 'a', 'n'];
+			} else {
+				cA = [tiles[i - boardSize[1]].innerHTML, tiles[i].innerHTML, tiles[i + boardSize[1]].innerHTML];
+			} 
+		} catch(e) {
+			cA = ['n', 'a', 'n'];
+		}
+		try {
+			if (i < boardSize[1] || i >= boardSize[0] * boardSize[1] - boardSize[1] || i % boardSize[1] == 0 || i % boardSize[1] == boardSize[1] - 1) {
+				cB = ['n', 'a', 'n'];
+			} else {
+				cB = [tiles[i - boardSize[1] + 1].innerHTML, tiles[i].innerHTML, tiles[i + boardSize[1] - 1].innerHTML];
+			}
+		} catch(e) {
+			cB = ['n', 'a', 'n'];
+		}
+		try {
+			if (i % boardSize[1] == 0 || i % boardSize[1] == boardSize[1] - 1) {
+				cC = ['n', 'a', 'n'];
+			} else {
+				cC = [tiles[i + 1].innerHTML, tiles[i].innerHTML, tiles[i - 1].innerHTML];
+			}
+		} catch(e) {
+			cC = ['n', 'a', 'n'];
+		}
+		try {
+			if (i < boardSize[1] || i >= boardSize[0] * boardSize[1] - boardSize[1] || i % boardSize[1] == 0 || i % boardSize[1] == boardSize[1] - 1) {
+				cD = ['n', 'a', 'n'];
+			} else {
+				cD = [tiles[i + boardSize[1] + 1].innerHTML, tiles[i].innerHTML, tiles[i - boardSize[1] - 1].innerHTML];
+			}
+		} catch(e) {
+			cD = ['n', 'a', 'n'];
+		}
+		console.log(cA + " - " + cB + " - " + cC + " - " + cD);
+		if (cA[0] == cA[1] && cA[1] == cA[2] && cA[0] != '' || cB[0] == cB[1] && cB[1] == cB[2] && cB[0] != '' || cC[0] == cC[1] && cC[1] == cC[2] && cC[0] != '' || cD[0] == cD[1] && cD[1] == cD[2] && cD[0] != '') {
+			document.getElementById('message').innerHTML = tiles[i].innerHTML + ' Wins! <a href="">🔄</a>';
+			for (j = 0; j < tiles.length; j++) {
+				tiles[j].style.pointerEvents = 'none';
+			}
+			break;
+		}
+	}
+}
+
+</script>
+</head>
+<body>
+<span id="message">❌'s Turn</span>
+<table id="board"></table>
+</body>
+<script type="text/javascript">
+	main();
+</script>
+</html>
